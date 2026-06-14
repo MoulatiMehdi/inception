@@ -1,0 +1,80 @@
+services:
+  mariadb:
+    restart: always
+    container_name: mariadb
+    image: mariadb-inception
+    build: ./requirements/mariadb/
+    env_file : 
+    -  .env
+    secrets:
+      - db_password
+      - db_root_password
+    volumes: 
+     - db-data:/var/lib/mysql
+    ports:
+      - "3306" 
+    networks:
+      - isolated
+  wordpress:
+    restart: always
+    container_name: wordpress
+    build: ./requirements/wordpress/
+    env_file:
+    - .env
+    depends_on: 
+    - mariadb 
+    secrets: 
+      - db_password
+      - credentials
+    volumes: 
+      - wp-files:/var/www/html
+    ports:
+      - "9000"
+    networks:
+      - isolated
+  nginx: 
+    restart: always
+    container_name: nginx 
+    build: ./requirements/nginx/
+    env_file : 
+    -  .env
+    depends_on: 
+       - wordpress
+    volumes: 
+      - wp-files:/var/www/html
+    ports: 
+      - "8080:443" #WARN: modify the host port to 443   
+    networks:
+      - isolated
+      - exposed 
+
+
+secrets: 
+  credentials: 
+    file: ../secrets/credentials.txt
+  db_password: 
+    file: ../secrets/db_password.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+
+
+volumes: 
+
+  db-data:
+    driver: local 
+    driver_opts: 
+      type: none 
+      o: bind
+      device: /home/mmoulati/data/db 
+
+  wp-files:
+    driver: local 
+    driver_opts: 
+      type: none 
+      o: bind
+      device: /home/mmoulati/data/wp 
+
+networks:
+  exposed :
+  isolated : 
+    internal : true

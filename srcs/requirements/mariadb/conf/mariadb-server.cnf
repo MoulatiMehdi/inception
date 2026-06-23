@@ -1,9 +1,15 @@
 [mariadbd]
+
 datadir=/var/lib/mysql
+
 user=mysql
+
 bind-address=0.0.0.0
 port=3306
 
+log_warnings = 0
+general_log = 0
+slow_query_log = 0
 [mariadb]
 
 port=3306

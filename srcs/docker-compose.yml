@@ -1,62 +1,131 @@
 services:
+
   mariadb:
-    restart: always
+    restart: on-failure
     container_name: mariadb
     image: mariadb-inception
     build: ./requirements/mariadb/
     env_file : 
-    -  .env
-    secrets:
-      - db_password
-      - db_root_password
-    volumes: 
-     - db-data:/var/lib/mysql
+      -  .env
+    healthcheck:
+      test : ["CMD-SHELL","mariadb-admin ping -h localhost -u test"] 
+      # volumes: 
+      #   - db-data:/var/lib/mysql
     ports:
       - "3306" 
     networks:
-      - isolated
+      - net 
+
   wordpress:
-    restart: always
+    restart: on-failure
     container_name: wordpress
+    image: wordpress-inception
     build: ./requirements/wordpress/
     env_file:
-    - .env
+      - .env
     depends_on: 
-    - mariadb 
-    secrets: 
-      - db_password
-      - credentials
+      mariadb :
+        condition: service_healthy
+      redis : 
+        condition: service_started
+    healthcheck:
+      test : ["CMD-SHELL","php-fpm83 -t"] 
     volumes: 
       - wp-files:/var/www/html
     ports:
       - "9000"
     networks:
-      - isolated
+      - net 
+
   nginx: 
-    restart: always
+    restart: on-failure
     container_name: nginx 
+    image: nginx-inception
     build: ./requirements/nginx/
     env_file : 
-    -  .env
+      -  .env
     depends_on: 
-       - wordpress
+      wordpress :
+        condition: service_healthy
     volumes: 
       - wp-files:/var/www/html
     ports: 
       - "8080:443" #WARN: modify the host port to 443   
     networks:
-      - isolated
-      - exposed 
+      - net 
 
+  redis:
+    restart: on-failure
+    container_name: redis 
+    image: redis-inception
+    build: ./requirements/bonus/redis/
+    env_file : 
+      -  .env
+    ports: 
+      - "6379"
+    networks:
+      - net 
 
-secrets: 
-  credentials: 
-    file: ../secrets/credentials.txt
-  db_password: 
-    file: ../secrets/db_password.txt
-  db_root_password:
-    file: ../secrets/db_root_password.txt
+  adminer: 
+    restart: always
+    container_name: adminer 
+    image: adminer-inception
+    build: ./requirements/bonus/adminer/
+    env_file : 
+      -  .env
+    depends_on: 
+      mariadb: 
+        condition : service_healthy
+    ports: 
+      - "8081:8081"   
+    networks:
+      - net 
 
+  ftp: 
+    restart: always
+    container_name: ftp 
+    image: ftp-inception
+    build: ./requirements/bonus/ftp/
+    env_file : 
+      -  .env
+    depends_on: 
+      wordpress: 
+        condition : service_started
+    volumes: 
+      - wp-files:/var/lib/ftp/
+    ports: 
+      - "8021:21" #WARN: change 8021 to 21 
+      - "30000-30100:30000-30100"
+    networks:
+      - net 
+
+  cadvisor:
+    image: cadvisor-inception
+    build : ./requirements/bonus/cadvisor/
+    container_name: cadvisor
+    restart: on-failure
+    ports:
+      - "7000:8080"
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    networks: 
+      - net
+  static_website:
+    image: website-inception
+    build : ./requirements/bonus/static_website/
+    container_name: website
+    restart: on-failure
+    ports:
+      - "3000:3000"
+    networks:
+      - net
 
 volumes: 
 
@@ -75,6 +144,5 @@ volumes:
       device: /home/mmoulati/data/wp 
 
 networks:
-  exposed :
-  isolated : 
-    internal : true
+  net :
+    driver: bridge

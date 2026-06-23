@@ -1,6 +1,3 @@
-
-
-
 # Mariadb
 
 1. install the container from docker.io
@@ -93,3 +90,34 @@ services:
   webapp:
     env_file: "webapp.env"
 ```
+
+
+# docker secret 
+To pass a secret to a build, use the docker build --secret flag.
+```sh
+ docker build --secret id=aws,src=$HOME/.aws/credentials .
+```
+
+To consume a secret in a build and make it accessible to the RUN instruction, use the --mount=type=secret flag in the Dockerfile.
+
+```sh
+RUN --mount=type=secret,id=aws \
+    AWS_SHARED_CREDENTIALS_FILE=/run/secrets/aws \
+    aws s3 cp ...
+```
+
+# Nginx 
+
+1- create a TLS private key and certificate
+
+```sh
+cd conf/ssl && 
+openssl req -x509 -nodes -days 365 \
+  -newkey rsa:2048 \
+  -keyout mmoulati.42.fr.key \
+  -out mmoulati.42.fr.crt
+
+```
+
+# Volume 
+- nginx and wordpress should be point to the same volume at the same path to make the configuration simple 

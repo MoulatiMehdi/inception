@@ -10,8 +10,6 @@ WP_DB_HOST="mariadb"
 REDIS_HOST="redis"
 REDIS_PORT="6379"
 
-rm -rf $WP_PATH/wp-config.php #WARN:: to be removed
-
 # Create wp-config.php if not exists
 
 if [ ! -f $WP_PATH/wp-config.php ]; then

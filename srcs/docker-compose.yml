@@ -9,8 +9,8 @@ services:
       -  .env
     healthcheck:
       test : ["CMD-SHELL","mariadb-admin ping -h localhost -u test"] 
-      # volumes: 
-      #   - db-data:/var/lib/mysql
+      volumes: 
+        - db-data:/var/lib/mysql
     ports:
       - "3306" 
     networks:
@@ -50,7 +50,7 @@ services:
     volumes: 
       - wp-files:/var/www/html
     ports: 
-      - "8080:443" #WARN: modify the host port to 443   
+      - "443:443"  
     networks:
       - net 
 
@@ -94,7 +94,7 @@ services:
     volumes: 
       - wp-files:/var/lib/ftp/
     ports: 
-      - "8021:21" #WARN: change 8021 to 21 
+      - "21:21"
       - "30000-30100:30000-30100"
     networks:
       - net 

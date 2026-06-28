@@ -158,7 +158,7 @@ Look for:
 Open:
 
 ```text
-https://localhost:8080
+https://mmoulati.42.fr
 ```
 
 Verify that:
@@ -167,6 +167,9 @@ Verify that:
 - Pages are accessible.
 - Comments can be created.
 - Administration access works.
+
+### NOTE 
+browser may replace `http` with `https` when trying to connect to `http://mmoulati.42.fr`
 
 ---
 

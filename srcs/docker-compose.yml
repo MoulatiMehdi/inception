@@ -1,6 +1,18 @@
 services:
+  redis:
+    restart: always
+    container_name: redis
+    image: redis-inception
+    build: ./requirements/bonus/redis/
+    env_file:
+      - .env
+    ports:
+      - "6379"
+    networks:
+      - net
+
   mariadb:
-    restart: on-failure
+    restart: always
     container_name: mariadb
     image: mariadb-inception
     build: ./requirements/mariadb/
@@ -16,7 +28,7 @@ services:
       - net
 
   wordpress:
-    restart: on-failure
+    restart: always
     container_name: wordpress
     image: wordpress-inception
     build: ./requirements/wordpress/
@@ -37,7 +49,7 @@ services:
       - net
 
   nginx:
-    restart: on-failure
+    restart: always
     container_name: nginx
     image: nginx-inception
     build: ./requirements/nginx/
@@ -50,18 +62,6 @@ services:
       - wp-files:/var/www/html
     ports:
       - "443:443"
-    networks:
-      - net
-
-  redis:
-    restart: on-failure
-    container_name: redis
-    image: redis-inception
-    build: ./requirements/bonus/redis/
-    env_file:
-      - .env
-    ports:
-      - "6379"
     networks:
       - net
 
@@ -94,7 +94,7 @@ services:
       - wp-files:/var/lib/ftp/
     ports:
       - "21:21"
-      - "30000-30100:30000-30100"
+      - "30000-30010:30000-30010"
     networks:
       - net
 
@@ -102,9 +102,9 @@ services:
     image: cadvisor-inception
     build: ./requirements/bonus/cadvisor/
     container_name: cadvisor
-    restart: on-failure
+    restart: always
     ports:
-      - "7000:8080"
+      - "8080:8080"
     privileged: true
     volumes:
       - /:/rootfs:ro
@@ -121,7 +121,7 @@ services:
     image: website-inception
     build: ./requirements/bonus/static_website/
     container_name: website
-    restart: on-failure
+    restart: always
     ports:
       - "3000:3000"
     networks:
@@ -133,14 +133,14 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/mmoulati/data
+      device: /home/mmoulati/data/db
 
   wp-files:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/mmoulati/data
+      device: /home/mmoulati/data/wp
 
 networks:
   net:

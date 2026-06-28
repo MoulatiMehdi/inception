@@ -11,7 +11,7 @@ COPY tools/docker-entrypoint.sh /
 
 RUN chmod +x /docker-entrypoint.sh 
 
-EXPOSE 20-22 990 21100-21110 
+EXPOSE 21 30000-30010 
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 

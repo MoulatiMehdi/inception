@@ -28,21 +28,7 @@ The stack consists of the following services:
 From the root of the repository:
 
 ```bash
-cd /path/to/project
 make
-```
-
-or
-
-```bash
-cd /path/to/project
-docker compose -f srcs/docker-compose.yml up --build -d
-```
-
-To verify that the containers have started:
-
-```bash
-docker compose -f srcs/docker-compose.yml ps
 ```
 
 ---
@@ -60,6 +46,7 @@ To stop and remove volumes:
 ```bash
 docker compose -f srcs/docker-compose.yml down -v
 ```
+
 ---
 
 # 4. Accessing the Services
@@ -84,17 +71,18 @@ How to open wordpress site:
 ## Adminer
 
 1. Open `http://localhost:8081`
-2. Log in using the credentials in the .env file for MySQL
+1. Log in using the credentials in the .env file for MySQL
 
 ---
 
 ## FTP
 
-Connect using an FTP client:
+1. Connect using an existing FTP client:
 
 ```sh 
 ftp <ftpuser>@localhost
 ```
+1.  insert the password for that user
 
 
 ---
@@ -113,30 +101,9 @@ ftp <ftpuser>@localhost
 
 # 5. Credentials Management
 
-The project configuration is stored in: `srcs/.env`
+The project credentials are stored in: `srcs/.env`
 
 
-Examples include:
-
-```.env
-
-DOMAIN_NAME=
- 
-MYSQL_USER=
-MYSQL_USER_PASSWORD=
-MYSQL_ROOT_PASSWORD=
-
-WP_ADMIN=
-WP_ADMIN_PASSWORD= 
-WP_ADMIN_MAIL=
-
-WP_USER=
-WP_USER_PASSWORD=
-WP_USER_MAIL=
-
-FTP_USER=
-FTP_PASSWORD=
-```
 ---
 
 # 6. Verifying Service Health

@@ -3,12 +3,12 @@ FROM alpine:3.23
 
 RUN  apk update  \
     && apk add mariadb envsubst mariadb-client\
+    && rm -rf /var/lib/mysql \
     && mkdir -p /var/lib/mysql /run/mysqld \
-    && chmod 1777 /run/mysqld \ 
-    && mariadb-install-db --user=mysql --datadir=/var/lib/mysql  --skip-test-db --skip-name-resolve 
+    && chown -R mysql:mysql /var/lib/mysql /run/mysqld \
+    && chmod 1777 /run/mysqld 
 
 WORKDIR /var/lib/mysql/
-
 
 COPY ./tools/docker-entrypoint.sh /docker-entrypoint.sh
 COPY ./conf/mariadb-server.cnf /etc/my.cnf.d/mariadb-server.cnf

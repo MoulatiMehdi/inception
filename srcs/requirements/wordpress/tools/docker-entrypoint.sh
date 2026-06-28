@@ -19,7 +19,7 @@ if [ ! -f $WP_PATH/wp-config.php ]; then
         --dbuser="$MYSQL_USER" \
         --dbpass="$MYSQL_USER_PASSWORD" \
         --dbhost="$WP_DB_HOST" \
-        --skip-check >/dev/null
+        --skip-check
 
     #wp config set WP_HOST "https://$DOMAIN_NAME" --allow-root
     #wp config set WP_SITEURL "https://$DOMAIN_NAME" --allow-root

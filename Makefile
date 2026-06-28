@@ -5,46 +5,39 @@ COMPOSE_FLAGS = -f ./srcs/docker-compose.yml
 COMPOSE = docker compose $(COMPOSE_FLAGS) 
 
 #dirs 
-VOLUMES = /home/mmoulati/data
+VOLUMES = /home/mmoulati/data/db /home/mmoulati/data/wp
 
 #files 
 ENV_FILE= srcs/.env
 
 all: $(VOLUMES) domain 
-	- $(COMPOSE) up --build
+	$(COMPOSE) up --build
+
+verify:
+	$(COMPOSE) ps
 
 $(VOLUMES) : 
-	- mkdir -p $(VOLUMES) 
+	mkdir -p $(VOLUMES) 
 
-domain : $(ENV_FILE) 
+domain : $(ENV_FILE)  
+	echo "127.0.0.1 $(shell grep '^DOMAIN_NAME=' $(ENV_FILE) | cut -d= -f2)\n127.0.0.1 localhost" > /etc/hosts
 
-	DOMAIN=$(shell grep '^DOMAIN_NAME=' "${ENV_FILE}" | cut -d= -f2)
-	sudo sed -i "/127.0.0.1/d" /etc/hosts
-	echo "127.0.0.1 $(DOMAIN)" | sudo tee -a /etc/hosts
-	echo "127.0.0.1 localhost" | sudo tee -a /etc/hosts
-
-alpine: 
-	-docker run -it alpine:3.23 /bin/sh 
-wp-sh : 
-	-$(COMPOSE) exec wordpress /bin/sh 
-db-sh : 
-	-$(COMPOSE) exec mariadb /bin/sh 
-nginx-sh:
-	-$(COMPOSE) exec nginx /bin/sh 
-
-clean:
+down:
 	-$(COMPOSE) down -v
 
-fclean : clean
+clean: down
 	-docker stop `docker ps -qa` 2> /dev/null;
 	-docker rm `docker ps -qa` 2> /dev/null;
 	-docker rmi -f `docker images -qa` 2> /dev/null;
 	-docker volume rm `docker volume ls -q` 2> /dev/null;
 	-docker network rm `docker network ls -q` 2>/dev/null
 
-rebuild : fclean all
+fclean : clean
+	sudo rm -rf /home/mmoulati/data/
+
+re : fclean all
 
 restart: clean all
 	
 
-.PHONY : clean fclean all rebuild restart db-sh wp-sh nginx-sh dir alpine domain
+.PHONY : clean fclean all rebuild restart domain

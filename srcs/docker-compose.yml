@@ -1,20 +1,19 @@
 services:
-
   mariadb:
     restart: on-failure
     container_name: mariadb
     image: mariadb-inception
     build: ./requirements/mariadb/
-    env_file : 
-      -  .env
+    env_file:
+      - .env
     healthcheck:
-      test : ["CMD-SHELL","mariadb-admin ping -h localhost -u test"] 
-      volumes: 
-        - db-data:/var/lib/mysql
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u test"]
+    volumes:
+      - db-data:/var/lib/mysql
     ports:
-      - "3306" 
+      - "3306"
     networks:
-      - net 
+      - net
 
   wordpress:
     restart: on-failure
@@ -23,85 +22,85 @@ services:
     build: ./requirements/wordpress/
     env_file:
       - .env
-    depends_on: 
-      mariadb :
+    depends_on:
+      mariadb:
         condition: service_healthy
-      redis : 
+      redis:
         condition: service_started
     healthcheck:
-      test : ["CMD-SHELL","php-fpm83 -t"] 
-    volumes: 
+      test: ["CMD-SHELL", "php-fpm83 -t"]
+    volumes:
       - wp-files:/var/www/html
     ports:
       - "9000"
     networks:
-      - net 
+      - net
 
-  nginx: 
+  nginx:
     restart: on-failure
-    container_name: nginx 
+    container_name: nginx
     image: nginx-inception
     build: ./requirements/nginx/
-    env_file : 
-      -  .env
-    depends_on: 
-      wordpress :
+    env_file:
+      - .env
+    depends_on:
+      wordpress:
         condition: service_healthy
-    volumes: 
+    volumes:
       - wp-files:/var/www/html
-    ports: 
-      - "443:443"  
+    ports:
+      - "443:443"
     networks:
-      - net 
+      - net
 
   redis:
     restart: on-failure
-    container_name: redis 
+    container_name: redis
     image: redis-inception
     build: ./requirements/bonus/redis/
-    env_file : 
-      -  .env
-    ports: 
+    env_file:
+      - .env
+    ports:
       - "6379"
     networks:
-      - net 
+      - net
 
-  adminer: 
+  adminer:
     restart: always
-    container_name: adminer 
+    container_name: adminer
     image: adminer-inception
     build: ./requirements/bonus/adminer/
-    env_file : 
-      -  .env
-    depends_on: 
-      mariadb: 
-        condition : service_healthy
-    ports: 
-      - "8081:8081"   
+    env_file:
+      - .env
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
     networks:
-      - net 
+      - net
 
-  ftp: 
+  ftp:
     restart: always
-    container_name: ftp 
+    container_name: ftp
     image: ftp-inception
     build: ./requirements/bonus/ftp/
-    env_file : 
-      -  .env
-    depends_on: 
-      wordpress: 
-        condition : service_started
-    volumes: 
+    env_file:
+      - .env
+    depends_on:
+      wordpress:
+        condition: service_started
+    volumes:
       - wp-files:/var/lib/ftp/
-    ports: 
+    ports:
       - "21:21"
       - "30000-30100:30000-30100"
     networks:
-      - net 
+      - net
 
   cadvisor:
     image: cadvisor-inception
-    build : ./requirements/bonus/cadvisor/
+    build: ./requirements/bonus/cadvisor/
     container_name: cadvisor
     restart: on-failure
     ports:
@@ -115,11 +114,12 @@ services:
       - /dev/disk/:/dev/disk:ro
     devices:
       - /dev/kmsg:/dev/kmsg
-    networks: 
+    networks:
       - net
+
   static_website:
     image: website-inception
-    build : ./requirements/bonus/static_website/
+    build: ./requirements/bonus/static_website/
     container_name: website
     restart: on-failure
     ports:
@@ -127,22 +127,21 @@ services:
     networks:
       - net
 
-volumes: 
-
+volumes:
   db-data:
-    driver: local 
-    driver_opts: 
-      type: none 
+    driver: local
+    driver_opts:
+      type: none
       o: bind
-      device: /home/mmoulati/data/db 
+      device: /home/mmoulati/data
 
   wp-files:
-    driver: local 
-    driver_opts: 
-      type: none 
+    driver: local
+    driver_opts:
+      type: none
       o: bind
-      device: /home/mmoulati/data/wp 
+      device: /home/mmoulati/data
 
 networks:
-  net :
+  net:
     driver: bridge

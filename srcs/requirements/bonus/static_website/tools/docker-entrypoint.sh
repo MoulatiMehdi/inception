@@ -4,6 +4,6 @@ set -eu
 
 npm install
 
-npm next build
+npm run build
 
 exec "$@"

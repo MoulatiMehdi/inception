@@ -3,18 +3,18 @@ FROM alpine:3.23
 ARG WP_VERSION=7.0
 
 RUN apk add --no-cache \
-        php83 \
-        php83-fpm \
-        php83-mysqli \
-        php83-zip \
-        php83-curl \
-        php83-phar \
-        php83-tokenizer \
-        php83-mbstring \
-        php83-opcache \
-        php83-pecl-redis \
-        php83-ctype \
-        php83-xml 
+    php83 \
+    php83-fpm \
+    php83-mysqli \
+    php83-zip \
+    php83-curl \
+    php83-phar \
+    php83-tokenizer \
+    php83-mbstring \
+    php83-opcache \
+    php83-pecl-redis \
+    php83-ctype \
+    php83-xml 
 
 WORKDIR /var/www/html 
 

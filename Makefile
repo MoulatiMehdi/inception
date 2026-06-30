@@ -10,10 +10,10 @@ VOLUMES = /home/mmoulati/data/db /home/mmoulati/data/wp
 #files 
 ENV_FILE= srcs/.env
 
-all: $(VOLUMES) domain 
+up: $(VOLUMES) domain 
 	$(COMPOSE) up --build
 
-verify:
+ps:
 	$(COMPOSE) ps
 
 $(VOLUMES) : 
@@ -23,7 +23,7 @@ domain : $(ENV_FILE)
 	echo "127.0.0.1 $(shell grep '^DOMAIN_NAME=' $(ENV_FILE) | cut -d= -f2)\n127.0.0.1 localhost" > /etc/hosts
 
 down:
-	-$(COMPOSE) down -v
+	-$(COMPOSE) down
 
 clean: down
 	-docker stop `docker ps -qa` 2> /dev/null;
@@ -35,9 +35,9 @@ clean: down
 fclean : clean
 	sudo rm -rf /home/mmoulati/data/
 
-re : fclean all
+re : fclean up
 
-restart: clean all
+restart: clean up
 	
 
-.PHONY : clean fclean all rebuild restart domain
+.PHONY : clean fclean up rebuild restart domain

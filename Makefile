@@ -28,16 +28,15 @@ down:
 clean: down
 	-docker stop `docker ps -qa` 2> /dev/null;
 	-docker rm `docker ps -qa` 2> /dev/null;
+
+fclean : clean
 	-docker rmi -f `docker images -qa` 2> /dev/null;
 	-docker volume rm `docker volume ls -q` 2> /dev/null;
 	-docker network rm `docker network ls -q` 2>/dev/null
-
-fclean : clean
-	sudo rm -rf /home/mmoulati/data/
 
 re : fclean up
 
 restart: clean up
 	
 
-.PHONY : clean fclean up rebuild restart domain
+.PHONY : clean fclean up re restart domain

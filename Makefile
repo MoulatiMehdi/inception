@@ -39,4 +39,4 @@ re : fclean up
 restart: clean up
 	
 
-.PHONY : clean fclean up re restart domain
+.PHONY : clean fclean up re restart domain down ps

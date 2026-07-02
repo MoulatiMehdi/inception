@@ -2,7 +2,7 @@
 
 set -eu
 
-WP_URL="$DOMAIN_NAME"
+WP_URL="https://$DOMAIN_NAME/"
 WP_PATH="/var/www/html/"
 WP_TITLE="My Wordpress"
 WP_DB_HOST="mariadb"
@@ -21,8 +21,8 @@ if [ ! -f $WP_PATH/wp-config.php ]; then
         --dbhost="$WP_DB_HOST" \
         --skip-check
 
-    #wp config set WP_HOST "https://$DOMAIN_NAME" --allow-root
-    #wp config set WP_SITEURL "https://$DOMAIN_NAME" --allow-root
+    wp config set WP_HOST "$WP_URL" --allow-root
+    wp config set WP_SITEURL "$WP_URL" --allow-root
 
     echo "Adding redis env variables..."
     wp --path=$WP_PATH config set FORCE_SSL_ADMIN 'false' --allow-root
@@ -39,7 +39,7 @@ if [ ! -f $WP_PATH/wp-config.php ]; then
         --admin_email="$WP_ADMIN_MAIL" \
         --allow-root
 
-    wp user create $WP_USER $WP_USER_MAIL --user_pass=$WP_USER_PASSWORD --role='author' --allow-root
+    wp user create "$WP_USER" "$WP_USER_MAIL" --user_pass="$WP_USER_PASSWORD" --role='author' --allow-root
 
     echo "Installing Redis-Cache plugin..."
     wp --path=$WP_PATH plugin install redis-cache --allow-root
